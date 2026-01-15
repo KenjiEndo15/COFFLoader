@@ -4,9 +4,6 @@
 #include "../inc/main.h"
 #include "../inc/beaconApi.h"
 
-/*
-
-*/
 BOOL symbolsExecution(POBJECT_CTX objectCtx, PSTR entryFuncName, PBYTE argsAddr, ULONG argsSize) {
 	DWORD numberOfSymbols = objectCtx->fileHeader->NumberOfSymbols;
 
@@ -36,8 +33,6 @@ BOOL symbolsExecution(POBJECT_CTX objectCtx, PSTR entryFuncName, PBYTE argsAddr,
 			}
 
 			VOID(*MAIN_FUNCTION)(PBYTE, ULONG) = NULL;
-
-			// getchar();
 
 			MAIN_FUNCTION = (PVOID)((ULONG_PTR)sectionAddress + imageSymbol->Value);
 			MAIN_FUNCTION(argsAddr, argsSize);
@@ -92,10 +87,6 @@ VOID performRelocations(WORD relocationType, PVOID relocationAddress, PVOID sect
 	}
 }
 
-/*
-Coming from resolveSymbol(...),
-resolve the symbol by retrieving a beacon API function pointer.
-*/
 PVOID retrieveBeaconApiSymbols(PSTR symbolToResolve) {
 	PVOID symbolResolved = { 0 };
 
@@ -124,12 +115,6 @@ PVOID retrieveBeaconApiSymbols(PSTR symbolToResolve) {
 	return symbolResolved;
 }
 
-/*
-Coming from resolveSymbol(...),
-resolve the (imported) symbol by getting a handle to a module,
-and loading a function from that module.
-	Note: The symbol's syntax is MODULE$function.
-*/
 PVOID resolveInternalExternalSymbols(PSTR symbolToResolve) {
 	PCHAR dollarSignPosition = strchr(symbolToResolve, '$');
 
@@ -165,9 +150,6 @@ PVOID resolveInternalExternalSymbols(PSTR symbolToResolve) {
 	return symbolResolved;
 }
 
-/*
-Check if a symbol represents a beacon API function, else directly resolve the symbol.
-*/
 PVOID resolveSymbol(PSTR symbolToResolve) {
 	PVOID symbolResolved = { 0 };
 
@@ -190,9 +172,6 @@ PVOID resolveSymbol(PSTR symbolToResolve) {
 	return symbolResolved;
 }
 
-/*
-
-*/
 BOOL processSections(POBJECT_CTX objectCtx) {
 	WORD numberOfSections = objectCtx->fileHeader->NumberOfSections;
 	PIMAGE_RELOCATION imageRelocation = NULL;
@@ -259,9 +238,6 @@ BOOL processSections(POBJECT_CTX objectCtx) {
 	return TRUE;
 }
 
-/*
-Copy the object file's section into the allocated virtual memory region (given by allocateMemory(...))
-*/
 BOOL copySectionsInMemory(POBJECT_CTX objectCtx) {
 	WORD numberOfSections = objectCtx->fileHeader->NumberOfSections;
 
@@ -307,9 +283,6 @@ BOOL sectionMapsMemoryAllocation(POBJECT_CTX objectCtx) {
 	return TRUE;
 }
 
-/*
-Find the size of the raw object file's sections and imported symbols (i.e., starts with __imp_).
-*/
 ULONG objectVirtualSize(POBJECT_CTX objectCtx) {
 	ULONG alignedSizeOfRawData = 0;
 	WORD numberOfSections = objectCtx->fileHeader->NumberOfSections;
@@ -352,9 +325,6 @@ ULONG objectVirtualSize(POBJECT_CTX objectCtx) {
 	return PAGE_ALIGN(alignedSizeOfRawData);
 }
 
-/*
-Allocate a virtual memory the size of the raw object file's sections and imported symbols.
-*/
 BOOL allocateMemory(POBJECT_CTX objectCtx) {
 	objectCtx->size = objectVirtualSize(objectCtx);
 
@@ -412,9 +382,6 @@ BOOL objectLoader(PVOID objectFileAddr, PSTR entryFuncName, PBYTE argsAddr, ULON
 	return TRUE;
 }
 
-/*
-Read a raw object file from disk, and put it into virtual memory.
-*/
 BOOL ReadFileFromDisk(LPCSTR objectFileName, PBYTE* objectFileAddr, PDWORD objectFileSize) {
 	LPVOID _objectFileAddr = NULL;
 
